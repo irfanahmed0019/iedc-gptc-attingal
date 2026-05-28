@@ -3,7 +3,7 @@
 > **Build. Innovate. Launch.**  
 > Official website for the Innovation and Entrepreneurship Development Cell (IEDC) at Government Polytechnic College Attingal, Kerala.
 
-🌐 **Live Site:** [iedcgptc.netlify.app](https://iedcgptc.netlify.app)
+🌐 **Live Site:** [iedcgptc.netlify.app](https://iedc-gptc-attingal.netlify.app)
 
 ---
 
