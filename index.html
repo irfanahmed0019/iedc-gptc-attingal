@@ -886,7 +886,7 @@ const cam=new THREE.PerspectiveCamera(42,1,.1,2000);
  lamp(0xffd9a8,9,24,18,-26,8,6);lamp(0x9ab8ff,3,30,10,10,26,10);lamp(0xb59cff,4,16,16,22,-6,-20);lamp(0xffffff,2,40,6,0,-24,0);
  const pm=new THREE.PMREMGenerator(renderer);scene.environment=pm.fromScene(es,.04).texture;pm.dispose()}
 // lights: warm planet-side key, cool fill
-const key=new THREE.DirectionalLight(0xffd2a0,2.4);key.position.set(-30,14,20);scene.add(key);
+const key=new THREE.DirectionalLight(0xffd2a0,3.4);key.position.set(-30,14,20);scene.add(key);
 const fill=new THREE.DirectionalLight(0x8fa8ff,.7);fill.position.set(25,10,15);scene.add(fill);
 scene.add(new THREE.AmbientLight(0x303050,.5));
 // ---- craft (original design) ----
@@ -948,37 +948,37 @@ function planetTex(){const c=document.createElement('canvas');c.width=1024;c.hei
  const gr=g.createLinearGradient(0,0,0,512);gr.addColorStop(0,'#f7e3b5');gr.addColorStop(.35,'#e6bf80');gr.addColorStop(.7,'#d29b55');gr.addColorStop(1,'#f0d9a8');g.fillStyle=gr;g.fillRect(0,0,1024,512);
  for(let i=0;i<260;i++){const x=Math.random()*1024,y=Math.random()*512,r=10+Math.random()*60;const rg=g.createRadialGradient(x,y,0,x,y,r);const dark=Math.random()<.5;rg.addColorStop(0,dark?'rgba(120,70,30,.28)':'rgba(255,245,220,.25)');rg.addColorStop(1,'rgba(0,0,0,0)');g.fillStyle=rg;g.save();g.translate(x,y);g.scale(2.4,.7);g.translate(-x,-y);g.fillRect(x-r,y-r,r*2,r*2);g.restore()}
  const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;t.anisotropy=4;return t}
-const planet=new THREE.Mesh(new THREE.SphereGeometry(1,64,48),new THREE.MeshStandardMaterial({map:planetTex(),roughness:.95,metalness:0,envMapIntensity:.15,transparent:true}));
+const planet=new THREE.Mesh(new THREE.SphereGeometry(1,64,48),new THREE.MeshStandardMaterial({map:planetTex(),roughness:.95,metalness:0,envMapIntensity:.15,emissive:0x5a2f10,emissiveIntensity:.35,transparent:true}));
 const pg=new THREE.Group();pg.add(planet);
 const atmo=new THREE.Mesh(new THREE.SphereGeometry(1.14,48,36),new THREE.ShaderMaterial({transparent:true,side:THREE.BackSide,depthWrite:false,blending:THREE.AdditiveBlending,
  uniforms:{uO:{value:1}},vertexShader:`varying vec3 n;varying vec3 v;void main(){n=normalize(normalMatrix*normal);vec4 mv=modelViewMatrix*vec4(position,1.);v=normalize(-mv.xyz);gl_Position=projectionMatrix*mv;}`,
  fragmentShader:`varying vec3 n;varying vec3 v;uniform float uO;void main(){float f=pow(clamp(dot(n,v)*-1.+.0,0.,1.)*0.0+ (1.0-abs(dot(n,v))),3.0);float i=pow(max(0.,dot(-n,v)),2.0);gl_FragColor=vec4(vec3(1.,.55,.18)*(.25+1.6*i),uO*(.15+.85*i)*.9);}`}));
 pg.add(atmo);
 const halo=new THREE.Sprite(new THREE.SpriteMaterial({map:GT,color:0xff9a3c,blending:THREE.AdditiveBlending,depthWrite:false,transparent:true,opacity:.55}));halo.scale.set(3.6,3.6,1);pg.add(halo);
-const PR=28;pg.scale.setScalar(PR);pg.position.set(44,-2,-250);scene.add(pg);planet.rotation.y=2.2;
+const PR=32;pg.scale.setScalar(PR);pg.position.set(44,-2,-250);scene.add(pg);planet.rotation.y=2.2;
 // ---- choreography ----
 const P=(p,x,y,z)=>({p,v:new THREE.Vector3(x,y,z)});
-const keys=[P(0,-3,-1.2,-300),P(.28,-1,-.6,-230),P(.42,16,4.5,-70),P(.50,8,2.5,-32),P(.58,-6,-1,-34),P(.66,-14,-4,-60),P(.8,-18,-7,-120),P(1,-20,-8,-180)];
+const keys=[P(0,-3,-1.2,-300),P(.28,-1,-.6,-230),P(.40,14,4,-80),P(.48,8,2,-40),P(.58,-6,-.5,-42),P(.68,-12,-3,-70),P(.82,-14,-5,-100),P(1,-13,-5.5,-120)];
 const sm=t=>t*t*(3-2*t);
 const curve=new THREE.CatmullRomCurve3(keys.map(k=>k.v),false,'centripetal');
 function tAt(p){// map p to curve param by key spacing
  for(let i=0;i<keys.length-1;i++){if(p<=keys[i+1].p){const u=(p-keys[i].p)/(keys[i+1].p-keys[i].p);return (i+sm(u))/(keys.length-1)}}return 1}
 const tmp=new THREE.Vector3(),tmp2=new THREE.Vector3(),clamp=(x,a=0,b=1)=>Math.max(a,Math.min(b,x));
-let prog=0,tgt=0,vis=true,W=0,H=0;
+let prog=0,tgt=0,vis=true,W=0,H=0,XS=1,PX=44,PY=-2;
 function size(){const r=sticky.getBoundingClientRect();W=Math.max(1,r.width|0);H=Math.max(1,r.height|0);const d=Math.min(devicePixelRatio||1,1.75);renderer.setPixelRatio(d);renderer.setSize(W,H,false);cam.aspect=W/H;
  cam.fov=W/H<.8?58:42;cam.updateProjectionMatrix();uni.uPx.value=d*(W<700?.8:1);
- pg.position.set(W/H<.8?30:44,-2,-250);craft.scale.setScalar(W/H<.8?.78:1)}
+ const pt=W/H<.8;XS=pt?.42:1;PX=pt?15:44;PY=pt?-15:-2;craft.scale.setScalar(pt?1.0:1.55);pg.position.set(PX,PY,-250)}
 function render(p,t){
  const wp=clamp((p-.30)/.36),warp=Math.sin(Math.PI*wp);
  uni.uTravel.value=sm(wp)*900+t*3;uni.uLen.value=warp*70;uni.uVis.value=1;
- const u=tAt(p);curve.getPoint(u,tmp);craft.position.copy(tmp);
- curve.getPoint(Math.min(1,u+.01),tmp2);if(tmp2.distanceTo(tmp)<1e-4){curve.getPoint(Math.max(0,u-.01),tmp2);tmp2.sub(tmp).multiplyScalar(-1).add(tmp)}
+ const u=tAt(p);curve.getPoint(u,tmp);tmp.x*=XS;craft.position.copy(tmp);
+ curve.getPoint(Math.min(1,u+.01),tmp2);tmp2.x*=XS;if(tmp2.distanceTo(tmp)<1e-4){curve.getPoint(Math.max(0,u-.01),tmp2);tmp2.x*=XS;tmp2.sub(tmp).multiplyScalar(-1).add(tmp)}
  craft.lookAt(tmp2);
  const bank=Math.sin(Math.PI*clamp((p-.36)/.3))*.7-Math.sin(Math.PI*clamp((p-.55)/.25))*.5;
  model.rotation.z=bank+Math.sin(t*.8)*.03;model.rotation.x=Math.sin(t*.6)*.02;
  model.children.forEach(c=>{if(c.name==='eg'){const s=2.2+warp*2.2+Math.sin(t*20)*.15;c.scale.set(s,s,1)}});
  // planet drifts closer late in the sequence; slow spin
- const pp=sm(clamp((p-.55)/.4));pg.position.z=-250+pp*40;pg.position.x=(W/H<.8?34:46)-pp*6;planet.rotation.y=2.2+t*.01+p*.4;
+ const pp=sm(clamp((p-.55)/.4));pg.position.z=-250+pp*55;pg.position.x=PX+(W/H<.8?3:8)-pp*6;pg.position.y=PY;planet.rotation.y=2.2+t*.01+p*.4;
  atmo.material.uniforms.uO.value=sm(clamp((p-.6)/.15));
  halo.material.opacity=.55*sm(clamp((p-.6)/.15));
  pg.visible=p>.55;planet.material.opacity=sm(clamp((p-.58)/.14));
