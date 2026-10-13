@@ -784,59 +784,69 @@ const bar=document.getElementById('scrubBar'),dg=sec.querySelector('.dg'),wordEl
 const WORDS=['IDEA','BUILD','LAUNCH','GROW'];let lastStage=-1;
 function rnd(i){const x=Math.sin(i*127.1+311.7)*43758.5453;return x-Math.floor(x)}
 function ssize(){sdpr=Math.min(devicePixelRatio||1,1.5);sw=sc.clientWidth;sh=sc.clientHeight;sc.width=sw*sdpr;sc.height=sh*sdpr;sx.setTransform(sdpr,0,0,sdpr,0,0);
- stars=Array.from({length:sw<600?140:260},(_,i)=>({a:rnd(i)*6.283,d:Math.pow(rnd(i+500),.7),z:rnd(i+900),s:.5+rnd(i+1300)*1.3}))}
+ stars=Array.from({length:sw<600?320:900},(_,i)=>({x:rnd(i),y:rnd(i+500),v:rnd(i+900),b:.25+rnd(i+1700)*.75,s:rnd(i+1300)>.93?2:1.2}))}
 const ease=x=>x<0?0:x>1?1:x*x*(3-2*x);
-function ship(x,y,sz,roll,glow){
- sx.save();sx.translate(x,y);sx.rotate(roll);sx.scale(sz,sz);
- // engine plume
- const g=sx.createRadialGradient(-70,0,0,-70,0,90*glow);g.addColorStop(0,'rgba(255,255,255,.95)');g.addColorStop(.25,'rgba(190,150,255,.8)');g.addColorStop(1,'rgba(124,77,255,0)');
- sx.fillStyle=g;sx.beginPath();sx.ellipse(-80,0,120*glow,26*glow,0,0,7);sx.fill();
- // hull
- const hg=sx.createLinearGradient(0,-30,0,30);hg.addColorStop(0,'#efeaf8');hg.addColorStop(.5,'#8b82a0');hg.addColorStop(1,'#2a2336');
- sx.fillStyle=hg;sx.beginPath();sx.moveTo(95,0);sx.bezierCurveTo(60,-16,10,-24,-60,-22);sx.lineTo(-70,-8);sx.lineTo(-70,8);sx.lineTo(-60,22);sx.bezierCurveTo(10,24,60,16,95,0);sx.fill();
- // wings
- sx.fillStyle='#4b4260';sx.beginPath();sx.moveTo(-5,-18);sx.lineTo(-62,-62);sx.lineTo(-66,-20);sx.closePath();sx.fill();
- sx.beginPath();sx.moveTo(-5,18);sx.lineTo(-62,62);sx.lineTo(-66,20);sx.closePath();sx.fill();
- sx.strokeStyle='#d9c9ff';sx.lineWidth=1.5;sx.beginPath();sx.moveTo(-62,-62);sx.lineTo(-66,-20);sx.moveTo(-62,62);sx.lineTo(-66,20);sx.stroke();
- // cockpit
- sx.fillStyle='#b69cff';sx.beginPath();sx.ellipse(40,-3,22,6,.05,0,7);sx.fill();
- sx.fillStyle='#fff';sx.globalAlpha=.7;sx.beginPath();sx.ellipse(46,-5,9,2,0,0,7);sx.fill();sx.globalAlpha=1;
+function shipDraw(x,y,sz,roll,tilt,glow){
+ // original freighter-style craft: round hull, forked nose, offset cockpit, engine glow
+ sx.save();sx.translate(x,y);sx.rotate(roll);sx.scale(sz,sz*tilt);
+ let g=sx.createRadialGradient(-96,0,0,-96,0,70*glow);g.addColorStop(0,'rgba(190,225,255,.95)');g.addColorStop(.3,'rgba(110,170,255,.55)');g.addColorStop(1,'rgba(60,110,255,0)');
+ sx.fillStyle=g;sx.beginPath();sx.ellipse(-100,0,90*glow,16*glow+4,0,0,7);sx.fill();
+ const hg=sx.createLinearGradient(0,-60,0,60);hg.addColorStop(0,'#f2f0ea');hg.addColorStop(.55,'#b9b6ae');hg.addColorStop(1,'#5d5b58');
+ // forked nose
+ sx.fillStyle='#a9a69f';sx.beginPath();sx.moveTo(30,-16);sx.lineTo(112,-13);sx.lineTo(112,-5);sx.lineTo(44,-3);sx.closePath();sx.fill();
+ sx.beginPath();sx.moveTo(30,16);sx.lineTo(112,13);sx.lineTo(112,5);sx.lineTo(44,3);sx.closePath();sx.fill();
+ // round hull
+ sx.fillStyle=hg;sx.beginPath();sx.ellipse(-8,0,86,54,0,0,7);sx.fill();
+ sx.strokeStyle='rgba(60,58,54,.55)';sx.lineWidth=1.4;
+ sx.beginPath();sx.ellipse(-8,0,64,38,0,0,7);sx.stroke();
+ sx.beginPath();sx.ellipse(-14,0,36,20,0,0,7);sx.stroke();
+ for(let i=0;i<9;i++){const a=i/9*6.283;sx.beginPath();sx.moveTo(-8+Math.cos(a)*38,Math.sin(a)*22);sx.lineTo(-8+Math.cos(a)*80,Math.sin(a)*50);sx.stroke()}
+ // panels / dish / cockpit tube
+ sx.fillStyle='rgba(70,68,64,.45)';for(let i=0;i<7;i++){sx.fillRect(-60+i*14,-30+((i*37)%50),10,5)}
+ sx.fillStyle='#8c8a84';sx.beginPath();sx.ellipse(-30,-22,9,7,0,0,7);sx.fill();
+ sx.fillStyle='#d9d6ce';sx.beginPath();sx.ellipse(52,-30,26,9,.18,0,7);sx.fill();
+ sx.fillStyle='#2b3a4c';sx.beginPath();sx.ellipse(66,-31,8,5,.18,0,7);sx.fill();
+ // engine bar
+ sx.fillStyle='#bfe0ff';sx.fillRect(-98,-24,5,48);
  sx.restore()}
-function planet(cx,cy,r){
- // glow
- let g=sx.createRadialGradient(cx,cy,r*.9,cx,cy,r*2.1);g.addColorStop(0,'rgba(150,100,255,.55)');g.addColorStop(1,'rgba(80,40,200,0)');
- sx.fillStyle=g;sx.beginPath();sx.arc(cx,cy,r*2.1,0,7);sx.fill();
- // body, lit from lower-left
- g=sx.createRadialGradient(cx-r*.45,cy+r*.35,r*.1,cx,cy,r);
- g.addColorStop(0,'#f4eaff');g.addColorStop(.35,'#a97bff');g.addColorStop(.75,'#3a2478');g.addColorStop(1,'#07040f');
- sx.fillStyle=g;sx.beginPath();sx.arc(cx,cy,r,0,7);sx.fill();
- // surface bands
- sx.save();sx.beginPath();sx.arc(cx,cy,r,0,7);sx.clip();sx.globalAlpha=.12;sx.strokeStyle='#fff';sx.lineWidth=r*.04;
- for(let i=-3;i<=3;i++){sx.beginPath();sx.ellipse(cx,cy+i*r*.24,r*1.2,r*.1,-.2,0,7);sx.stroke()}sx.restore();}
+function planetDraw(cx,cy,r,a){
+ sx.save();sx.globalAlpha=a;
+ let g=sx.createRadialGradient(cx,cy,r*.8,cx,cy,r*2.3);g.addColorStop(0,'rgba(255,170,70,.65)');g.addColorStop(.4,'rgba(255,130,40,.22)');g.addColorStop(1,'rgba(255,100,20,0)');
+ sx.fillStyle=g;sx.beginPath();sx.arc(cx,cy,r*2.3,0,7);sx.fill();
+ sx.save();sx.beginPath();sx.arc(cx,cy,r,0,7);sx.clip();
+ g=sx.createLinearGradient(cx-r,cy-r,cx+r,cy+r);g.addColorStop(0,'#fff6dc');g.addColorStop(.5,'#e9c98b');g.addColorStop(1,'#a8793c');
+ sx.fillStyle=g;sx.fillRect(cx-r,cy-r,r*2,r*2);
+ for(let i=0;i<26;i++){const px=cx+(rnd(i+40)-.5)*r*1.9,py=cy+(rnd(i+80)-.5)*r*1.9,pr=r*(.08+rnd(i+120)*.22);
+  const bg=sx.createRadialGradient(px,py,0,px,py,pr);bg.addColorStop(0,'rgba(150,100,40,.30)');bg.addColorStop(1,'rgba(150,100,40,0)');sx.fillStyle=bg;sx.fillRect(px-pr,py-pr,pr*2,pr*2)}
+ // terminator: dark disc shifted right makes a gibbous phase
+ const tg=sx.createRadialGradient(cx+r*.62,cy,r*.55,cx+r*.62,cy,r*1.12);tg.addColorStop(0,'rgba(0,0,0,.93)');tg.addColorStop(.82,'rgba(0,0,0,.9)');tg.addColorStop(1,'rgba(0,0,0,0)');
+ sx.fillStyle=tg;sx.fillRect(cx-r,cy-r,r*2,r*2);
+ sx.restore();sx.restore()}
 let prog=0,target=0,time=0;
+const cl=(x,a=0,b=1)=>Math.max(a,Math.min(b,x));
+const lerp=(a,b,t)=>a+(b-a)*t;
 function scene(p,t){
  sx.fillStyle='#000';sx.fillRect(0,0,sw,sh);
- const cx=sw/2,cy=sh/2,R=Math.hypot(sw,sh)/2;
- // speed profile: stars stream outward, strongest mid scene
- const warp=Math.sin(Math.PI*ease((p-.08)/.7))*(p<.85?1:0);
- const drift=p*2.2+t*.015;
+ // warp window: streaks only while the craft is close, like the reference sequence
+ const wp=cl((p-.36)/.34),warp=Math.sin(Math.PI*wp),travel=ease(wp)*2.6;
  for(const s of stars){
-  const z=((s.z+drift*(.25+s.s*.5))%1);const d=s.d*R*(.04+z*1.15);
-  const x=cx+Math.cos(s.a)*d*(sw/sh>1?1.15:1),y=cy+Math.sin(s.a)*d*.8;
-  const len=2+warp*60*z*z;const px=x-Math.cos(s.a)*len,py=y-Math.sin(s.a)*len*.8;
-  sx.strokeStyle='rgba('+(200+55*s.z|0)+','+(190+40*s.z|0)+',255,'+(.25+.7*z)+')';sx.lineWidth=s.s*(.4+z);
-  sx.beginPath();sx.moveTo(px,py);sx.lineTo(x,y);sx.stroke()}
- // planet appears late, from the right, growing
- const pp=ease((p-.55)/.45);
- if(pp>0){const r=Math.min(sw,sh)*(.1+.42*pp);planet(sw*(1.02-.42*pp),sh*(.66+.06*(1-pp)),r)}
- // ship: small in distance, flies in toward camera, banks, then drifts toward planet
- const a=ease(p/.45),b=ease((p-.45)/.55);
- let sz=(.12+.95*a)*(1-.45*b),x=cx+sw*.2*a-sw*.12*b,y=cy+sh*.24+Math.sin(t*1.4)*5+sh*.04*a-sh*.02*b;
- const roll=-.2*Math.sin(Math.PI*a)+.12*b+Math.sin(t*1.1)*.02;
- const mobile=sw<600;if(mobile)sz*=.7;
- ship(x,y,sz*Math.min(1,sw/900+.35),roll,.7+warp*.9);
- // vignette
- const vg=sx.createRadialGradient(cx,cy,R*.5,cx,cy,R*1.05);vg.addColorStop(0,'rgba(0,0,0,0)');vg.addColorStop(1,'rgba(0,0,0,.65)');sx.fillStyle=vg;sx.fillRect(0,0,sw,sh)}
+  let x=((s.x-travel*(.25+s.v))%1+1)%1*sw,y=(s.y+travel*.06*s.v)%1*sh;
+  const tw=.55+.45*Math.sin(t*(.6+s.v)+s.x*40);
+  if(warp>.04){const len=warp*(30+s.v*150);sx.strokeStyle='rgba(235,240,255,'+(.25+.6*warp)*s.b+')';sx.lineWidth=s.s*.8;sx.beginPath();sx.moveTo(x,y);sx.lineTo(x+len,y-len*.12);sx.stroke()}
+  else{sx.fillStyle='rgba(235,240,255,'+(s.b*tw)+')';sx.fillRect(x,y,s.s,s.s)}}
+ // planet: fades in as the craft recedes, warm half-lit sphere right of centre
+ const pp=ease((p-.6)/.22),pg=ease((p-.6)/.4);
+ if(pp>0)planetDraw(sw*.74,sh*.52,Math.min(sw*.3,sh*.17+sh*.05*pg),pp);
+ // craft path: speck -> approaches -> large banking pass -> small beside planet
+ const a=ease(p/.3),b=ease((p-.3)/.2),c=ease((p-.5)/.2),d=ease((p-.66)/.3);
+ let x=sw*(.42+.05*a+.2*b-.2*c+.0*d),y=sh*(.5-.02*a-.2*b+.3*c+.07*d);
+ if(c>0)x=lerp(sw*.65,sw*(.5+.02*d),c);
+ let sz=(.03+.05*a+1.0*b)*(1-c)+c*(.09+.02*d);
+ sz*=Math.min(1.1,sw/1000+.45);
+ const roll=(-.12*Math.sin(Math.PI*b)+.22*Math.sin(Math.PI*c))+Math.sin(t*.9)*.01;
+ const tilt=.55+.25*Math.sin(Math.PI*b);
+ shipDraw(x,y,sz*sw/1280*1.6,roll,tilt,.5+warp*1.2);
+ const vg=sx.createRadialGradient(sw/2,sh/2,Math.min(sw,sh)*.5,sw/2,sh/2,Math.hypot(sw,sh)/2);vg.addColorStop(0,'rgba(0,0,0,0)');vg.addColorStop(1,'rgba(0,0,0,.45)');sx.fillStyle=vg;sx.fillRect(0,0,sw,sh)}
 function pr(){const r=sec.getBoundingClientRect(),m=Math.max(r.height-innerHeight,1);return Math.min(1,Math.max(0,-r.top/m))}
 let hv=true,sv=true;
 const heroEl=document.getElementById('hero');
