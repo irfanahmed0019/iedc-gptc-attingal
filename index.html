@@ -963,11 +963,11 @@ function render(p,t){
  // astronaut pops out by the nose, hops over, plants a plain flag
  const kA=sm(clamp((p-.875)/.02)),kH=sm(clamp((p-.885)/.06)),kP=sm(clamp((p-.945)/.03));
  if(kA>0){
-  offV.copy(nV).multiplyScalar(PR+.2).addScaledVector(noseV,4.6);
+  offV.copy(nV).multiplyScalar(PR+.2).addScaledVector(noseV,7.0);
   posA.copy(offV).normalize().multiplyScalar(PR).add(C);
-  offV.copy(nV).multiplyScalar(PR+.2).addScaledVector(noseV,8.6).addScaledVector(sideV,.3);
+  offV.copy(nV).multiplyScalar(PR+.2).addScaledVector(noseV,11.6).addScaledVector(sideV,.4);
   surfF.copy(offV).normalize();posF.copy(surfF).multiplyScalar(PR).add(C);
-  offV.copy(nV).multiplyScalar(PR+.2).addScaledVector(noseV,6.8).addScaledVector(sideV,.2);
+  offV.copy(nV).multiplyScalar(PR+.2).addScaledVector(noseV,9.4).addScaledVector(sideV,.3);
   posS.copy(offV).normalize().multiplyScalar(PR).add(C);
   ast.position.lerpVectors(posA,posS,kH);
   hopN.copy(ast.position).sub(C).normalize();
@@ -990,10 +990,10 @@ function render(p,t){
  // camera: wide for the flight, dives to the surface for the landing
  const kC=sm(clamp((p-.80)/.18));
  cam0.set(Math.sin(t*.2)*.4+(p-.5)*1.2,Math.cos(t*.17)*.25,0);
- camF.copy(siteV).addScaledVector(nV,W/H<.8?4.4:3.5).addScaledVector(sideV,W/H<.8?-17:-13).addScaledVector(tanV,2);
+ camF.copy(siteV).addScaledVector(nV,W/H<.8?5.0:4.2).addScaledVector(sideV,W/H<.8?-20:-16).addScaledVector(tanV,2);
  cam.position.lerpVectors(cam0,camF,kC);
  lookT.set(0,0,-100);
- if(kC>0){lookB.copy(siteV).addScaledVector(nV,1.6).addScaledVector(noseV,3.5);lookT.lerp(lookB,kC)}
+ if(kC>0){lookB.copy(siteV).addScaledVector(nV,1.6).addScaledVector(noseV,4.5);lookT.lerp(lookB,kC)}
  cam.up.set(0,1,0);cam.lookAt(lookT);
  renderer.render(scene,cam)}
 function pr(){const r=sec.getBoundingClientRect(),m=Math.max(r.height-innerHeight,1);return clamp(-r.top/m)}
