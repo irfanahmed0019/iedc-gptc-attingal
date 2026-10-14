@@ -886,10 +886,10 @@ pg.add(atmo);
 const halo=new THREE.Sprite(new THREE.SpriteMaterial({map:GT,color:0xff9a3c,blending:THREE.AdditiveBlending,depthWrite:false,transparent:true,opacity:.55}));halo.scale.set(3.6,3.6,1);pg.add(halo);
 const PR=32;pg.scale.setScalar(PR);pg.position.set(44,-2,-250);scene.add(pg);planet.rotation.y=2.2;
 // ---- landing: astronaut + plain flag on the planet surface ----
-const nV=new THREE.Vector3(-.35,.22,.91).normalize();
+const nV=new THREE.Vector3(-.25,.90,.35).normalize();
 const sideV=new THREE.Vector3().crossVectors(nV,new THREE.Vector3(0,1,0)).normalize();
 const tanV=new THREE.Vector3().crossVectors(sideV,nV).normalize();
-const noseV=new THREE.Vector3().copy(sideV).multiplyScalar(-.95).addScaledVector(tanV,.31).normalize();
+const noseV=new THREE.Vector3().copy(tanV).normalize();
 const upY=new THREE.Vector3(0,1,0),ZERO=new THREE.Vector3(),tmpM=new THREE.Matrix4(),_ov=new THREE.Vector3();
 const siteV=new THREE.Vector3(),landFrom=new THREE.Vector3(),flyDir=new THREE.Vector3(),lookT=new THREE.Vector3(),lookB=new THREE.Vector3(),camF=new THREE.Vector3(),cam0=new THREE.Vector3();
 const offV=new THREE.Vector3(),posA=new THREE.Vector3(),posF=new THREE.Vector3(),posS=new THREE.Vector3(),surfF=new THREE.Vector3(),hopN=new THREE.Vector3(),faceV=new THREE.Vector3();
@@ -911,9 +911,9 @@ const flagG=new THREE.Group();
 const pole=new THREE.Mesh(new THREE.CylinderGeometry(.05,.06,3.6,10),new THREE.MeshStandardMaterial({color:0xd8d4e4,metalness:.7,roughness:.3}));
 pole.position.y=1.8;flagG.add(pole);
 const knob=new THREE.Mesh(new THREE.SphereGeometry(.1,12,10),pole.material);knob.position.y=3.65;flagG.add(knob);
-const clothG=new THREE.PlaneGeometry(2.3,1.4,16,10);clothG.translate(1.15,0,0);
+const clothG=new THREE.PlaneGeometry(2.0,1.15,18,10);clothG.translate(1.0,0,0);
 const cloth=new THREE.Mesh(clothG,new THREE.MeshStandardMaterial({color:0xf5f3fc,roughness:.7,metalness:0,side:THREE.DoubleSide,emissive:0x8a7fb0,emissiveIntensity:.12}));
-cloth.position.y=2.85;flagG.add(cloth);
+cloth.position.y=2.75;flagG.add(cloth);
 flagG.visible=false;scene.add(flagG);
 const clothBase=clothG.attributes.position.array.slice();
 // ---- choreography ----
@@ -950,7 +950,7 @@ function render(p,t){
  }else{
   const cS=Math.min(1,kL*1.12);
   landFrom.copy(tmp);
-  tmp.lerpVectors(landFrom,siteV,cS).addScaledVector(nV,Math.sin(Math.PI*cS)*6.5+cS*.9);
+  tmp.lerpVectors(landFrom,siteV,cS).addScaledVector(nV,Math.sin(Math.PI*cS)*6.5+cS*.75);
   craft.position.copy(tmp);
   orient(craft,flyDir,upY);qF.copy(craft.quaternion);
   orient(craft,noseV,nV);qL.copy(craft.quaternion);
@@ -963,11 +963,11 @@ function render(p,t){
  // astronaut pops out by the nose, hops over, plants a plain flag
  const kA=sm(clamp((p-.875)/.02)),kH=sm(clamp((p-.885)/.06)),kP=sm(clamp((p-.945)/.03));
  if(kA>0){
-  offV.copy(nV).multiplyScalar(PR+.2).addScaledVector(noseV,5.0);
+  offV.copy(nV).multiplyScalar(PR+.2).addScaledVector(noseV,4.6);
   posA.copy(offV).normalize().multiplyScalar(PR).add(C);
-  offV.copy(nV).multiplyScalar(PR+.2).addScaledVector(noseV,9.0).addScaledVector(sideV,.6);
+  offV.copy(nV).multiplyScalar(PR+.2).addScaledVector(noseV,8.6).addScaledVector(sideV,.3);
   surfF.copy(offV).normalize();posF.copy(surfF).multiplyScalar(PR).add(C);
-  offV.copy(nV).multiplyScalar(PR+.2).addScaledVector(noseV,7.3).addScaledVector(sideV,.4);
+  offV.copy(nV).multiplyScalar(PR+.2).addScaledVector(noseV,6.8).addScaledVector(sideV,.2);
   posS.copy(offV).normalize().multiplyScalar(PR).add(C);
   ast.position.lerpVectors(posA,posS,kH);
   hopN.copy(ast.position).sub(C).normalize();
@@ -978,22 +978,22 @@ function render(p,t){
   ast.scale.setScalar(Math.max(.001,kA));
   ast.visible=true;
   flagG.position.copy(posF);
-  offV.copy(tanV);
+  offV.copy(sideV);
   orient(flagG,offV,surfF);
   flagG.scale.set(1,Math.max(.001,kP),1);
   cloth.scale.x=Math.max(.001,sm(clamp((p-.952)/.03)));
   flagG.visible=kP>0;
   const posAtt=clothG.attributes.position;
-  for(let i=0;i<posAtt.count;i++){const x=clothBase[i*3];posAtt.setZ(i,cloth.scale.x>.05?(Math.sin(x*1.9+t*5.5)*.17+Math.sin(x*3.6+t*8.2)*.06)*(x/2.3):0)}
+  for(let i=0;i<posAtt.count;i++){const x=clothBase[i*3];posAtt.setZ(i,cloth.scale.x>.05?(Math.sin(x*2.6+t*5.5)*.22+Math.sin(x*4.8+t*8.2)*.08)*(x/2.0):0)}
   posAtt.needsUpdate=true;
  }else{ast.visible=false;flagG.visible=false}
  // camera: wide for the flight, dives to the surface for the landing
  const kC=sm(clamp((p-.80)/.18));
  cam0.set(Math.sin(t*.2)*.4+(p-.5)*1.2,Math.cos(t*.17)*.25,0);
- camF.copy(siteV).addScaledVector(nV,W/H<.8?5.5:4.5).addScaledVector(tanV,W/H<.8?-19:-15).addScaledVector(sideV,2);
+ camF.copy(siteV).addScaledVector(nV,W/H<.8?3.4:2.4).addScaledVector(sideV,W/H<.8?-17:-13).addScaledVector(tanV,2);
  cam.position.lerpVectors(cam0,camF,kC);
  lookT.set(0,0,-100);
- if(kC>0){lookB.copy(siteV).addScaledVector(nV,2.2).addScaledVector(noseV,3.2);lookT.lerp(lookB,kC)}
+ if(kC>0){lookB.copy(siteV).addScaledVector(nV,1.6).addScaledVector(noseV,3.5);lookT.lerp(lookB,kC)}
  cam.up.set(0,1,0);cam.lookAt(lookT);
  renderer.render(scene,cam)}
 function pr(){const r=sec.getBoundingClientRect(),m=Math.max(r.height-innerHeight,1);return clamp(-r.top/m)}
