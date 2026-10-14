@@ -988,7 +988,7 @@ function render(p,t){
   posAtt.needsUpdate=true;
  }else{ast.visible=false;flagG.visible=false}
  // camera: wide for the flight, dives to the surface for the landing
- const kC=sm(clamp((p-.80)/.18));
+ const kC=sm(clamp((p-.80)/(W/H<.8?.14:.18)));
  cam0.set(Math.sin(t*.2)*.4+(p-.5)*1.2,Math.cos(t*.17)*.25,0);
  camF.copy(siteV).addScaledVector(nV,W/H<.8?5.5:4.2).addScaledVector(sideV,W/H<.8?-36:-16).addScaledVector(tanV,2);
  cam.position.lerpVectors(cam0,camF,kC);
