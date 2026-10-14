@@ -886,7 +886,7 @@ pg.add(atmo);
 const halo=new THREE.Sprite(new THREE.SpriteMaterial({map:GT,color:0xff9a3c,blending:THREE.AdditiveBlending,depthWrite:false,transparent:true,opacity:.55}));halo.scale.set(3.6,3.6,1);pg.add(halo);
 const PR=32;pg.scale.setScalar(PR);pg.position.set(44,-2,-250);scene.add(pg);planet.rotation.y=2.2;
 // ---- landing: astronaut + plain flag on the planet surface ----
-const nV=new THREE.Vector3(-.25,.90,.35).normalize();
+const nV=new THREE.Vector3(-.15,.97,.19).normalize();
 const sideV=new THREE.Vector3().crossVectors(nV,new THREE.Vector3(0,1,0)).normalize();
 const tanV=new THREE.Vector3().crossVectors(sideV,nV).normalize();
 const noseV=new THREE.Vector3().copy(tanV).normalize();
@@ -912,7 +912,7 @@ const pole=new THREE.Mesh(new THREE.CylinderGeometry(.05,.06,3.6,10),new THREE.M
 pole.position.y=1.8;flagG.add(pole);
 const knob=new THREE.Mesh(new THREE.SphereGeometry(.1,12,10),pole.material);knob.position.y=3.65;flagG.add(knob);
 const clothG=new THREE.PlaneGeometry(2.0,1.15,18,10);clothG.translate(1.0,0,0);
-const cloth=new THREE.Mesh(clothG,new THREE.MeshStandardMaterial({color:0xf5f3fc,roughness:.7,metalness:0,side:THREE.DoubleSide,emissive:0x8a7fb0,emissiveIntensity:.12}));
+const cloth=new THREE.Mesh(clothG,new THREE.MeshStandardMaterial({color:0xf5f3fc,roughness:.7,metalness:0,side:THREE.DoubleSide,emissive:0x9a92b8,emissiveIntensity:.05}));
 cloth.position.y=2.75;flagG.add(cloth);
 flagG.visible=false;scene.add(flagG);
 const clothBase=clothG.attributes.position.array.slice();
@@ -990,7 +990,7 @@ function render(p,t){
  // camera: wide for the flight, dives to the surface for the landing
  const kC=sm(clamp((p-.80)/.18));
  cam0.set(Math.sin(t*.2)*.4+(p-.5)*1.2,Math.cos(t*.17)*.25,0);
- camF.copy(siteV).addScaledVector(nV,W/H<.8?3.4:2.4).addScaledVector(sideV,W/H<.8?-17:-13).addScaledVector(tanV,2);
+ camF.copy(siteV).addScaledVector(nV,W/H<.8?4.4:3.5).addScaledVector(sideV,W/H<.8?-17:-13).addScaledVector(tanV,2);
  cam.position.lerpVectors(cam0,camF,kC);
  lookT.set(0,0,-100);
  if(kC>0){lookB.copy(siteV).addScaledVector(nV,1.6).addScaledVector(noseV,3.5);lookT.lerp(lookB,kC)}
