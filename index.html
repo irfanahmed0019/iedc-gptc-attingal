@@ -28,7 +28,7 @@ body{background:#000}
 .scroll-cue{position:absolute;bottom:28px;left:50%;width:24px;height:40px;margin-left:-12px;border:2px solid #ffffff80;border-radius:14px;opacity:.8}
 .scroll-cue i{display:block;width:4px;height:10px;margin:7px auto;border-radius:3px;background:#ffffffaa;animation:cue 1.6s ease-in-out infinite}
 @keyframes cue{0%,100%{transform:translateY(0);opacity:.3}50%{transform:translateY(10px);opacity:1}}
-.scrub{height:460vh!important;position:relative;background:#000;padding:0!important;display:block!important;overflow:visible!important;max-width:none!important;margin:0!important;border:0!important}
+.scrub{height:540vh!important;position:relative;background:#000;padding:0!important;display:block!important;overflow:visible!important;max-width:none!important;margin:0!important;border:0!important}
 .scrub-sticky{position:sticky;top:0;height:100vh;height:100svh;overflow:hidden}
 #scrubFx{position:absolute;inset:0;width:100%;height:100%;display:block}
 .scrub-copy{position:absolute;inset:0;z-index:3;mix-blend-mode:difference;display:flex;flex-direction:column;justify-content:flex-start;padding:15vh 40px 0;max-width:1180px;margin:0 auto;pointer-events:none;color:#fff}
@@ -54,14 +54,14 @@ body{background:#000}
 .site-nav{padding:14px 18px}
 #hero{padding:96px 20px 80px}
 .hero-h1{font-size:clamp(32px,10vw,64px);letter-spacing:-.04em}
-.scrub{height:380vh!important}
+.scrub{height:430vh!important}
 .scrub-copy{padding:13vh 20px 0}
 .scrub-copy h2{font-size:clamp(34px,11vw,70px);letter-spacing:-.04em}
 .scrub-count{right:20px;bottom:30px}
 .scrub-count .digits{font-size:68px}
 }
 @media(prefers-reduced-motion:reduce){.scroll-cue i,.ld-mark{animation:none}}
-</style></head>
+</style><style>.about-grid{grid-template-columns:1fr}.about-cards{grid-template-columns:repeat(3,1fr)}@media(max-width:650px){.about-cards{grid-template-columns:1fr}}</style></head>
 <body><div id="loader" aria-hidden="true"><div class="ld-mark">IEDC<span>GPTC ATTINGAL</span></div></div><div id="cur" aria-hidden="true"></div><header class="site-nav"><a class="brand" href="#hero">IEDC<span>GPTC ATTINGAL</span></a><nav aria-label="Main navigation"><a href="#about">About</a><a href="#programs">Programs</a><a href="#team">Team</a><a class="nav-join" href="https://www.linkedin.com/in/iedc-gptc-attingal-1718a33b1" rel="noopener" target="_blank">Join IEDC ↗</a></nav></header>
 <!-- PAGE LOADER -->
 <!-- ─── PILL NAV ─────────────────────────────────────────────────── -->
@@ -167,32 +167,6 @@ body{background:#000}
 <div class="about-card-title">03 Four departments.</div>
 <div class="about-card-body">Computer Hardware, Electrical &amp; Electronics, Mechanical, Automobile.</div>
 </div>
-</div>
-</div>
-</div>
-<div class="reveal-right" data-delay="0.2">
-<div class="terminal">
-<div class="terminal-bar">
-<span class="t-dot t-red"></span>
-<span class="t-dot t-amber"></span>
-<span class="t-dot t-green"></span>
-<span class="t-label">IEDC-MISSION.LOG</span>
-</div>
-<div class="terminal-body">
-<div>
-<span class="t-comment">// Initializing IEDC Ecosystem</span>
-</div>
-<div><span class="t-key">status:</span>  <span class="t-val">student-led</span></div>
-<div><span class="t-key">location:</span> <span class="t-val">Attingal, Kerala 695103</span></div>
-<div><span class="t-key">network:</span>  <span class="t-val">KSUM network</span></div>
-<div><span class="t-section">--- <strong>CORE OBJECTIVES</strong> ---</span></div>
-<ul class="t-list">
-<li><span class="t-index">[0]</span> <span class="t-item">Ideas</span></li>
-<li><span class="t-index">[1]</span> <span class="t-item">Prototypes</span></li>
-<li><span class="t-index">[2]</span> <span class="t-item">Startups</span></li>
-<li><span class="t-index">[3]</span> <span class="t-item">Community</span></li>
-</ul>
-<div class="t-done">&gt; Ideas take off.</div>
 </div>
 </div>
 </div>
@@ -911,9 +885,39 @@ const atmo=new THREE.Mesh(new THREE.SphereGeometry(1.14,48,36),new THREE.ShaderM
 pg.add(atmo);
 const halo=new THREE.Sprite(new THREE.SpriteMaterial({map:GT,color:0xff9a3c,blending:THREE.AdditiveBlending,depthWrite:false,transparent:true,opacity:.55}));halo.scale.set(3.6,3.6,1);pg.add(halo);
 const PR=32;pg.scale.setScalar(PR);pg.position.set(44,-2,-250);scene.add(pg);planet.rotation.y=2.2;
+// ---- landing: astronaut + plain flag on the planet surface ----
+const nV=new THREE.Vector3(-.22,.56,.80).normalize();
+const sideV=new THREE.Vector3().crossVectors(nV,new THREE.Vector3(0,1,0)).normalize();
+const tanV=new THREE.Vector3().crossVectors(sideV,nV).normalize();
+const upY=new THREE.Vector3(0,1,0),ZERO=new THREE.Vector3(),tmpM=new THREE.Matrix4(),_ov=new THREE.Vector3();
+const siteV=new THREE.Vector3(),landFrom=new THREE.Vector3(),flyDir=new THREE.Vector3(),lookT=new THREE.Vector3(),lookB=new THREE.Vector3(),camF=new THREE.Vector3(),cam0=new THREE.Vector3();
+const offV=new THREE.Vector3(),posA=new THREE.Vector3(),posF=new THREE.Vector3(),posS=new THREE.Vector3(),surfF=new THREE.Vector3(),hopN=new THREE.Vector3(),faceV=new THREE.Vector3();
+const qF=new THREE.Quaternion(),qL=new THREE.Quaternion();
+function orient(o,f,up){_ov.copy(f).normalize().multiplyScalar(-1);tmpM.lookAt(ZERO,_ov,up);o.quaternion.setFromRotationMatrix(tmpM)}
+const suit=new THREE.MeshStandardMaterial({color:0xf2f0f8,roughness:.55,metalness:.08});
+const suitD=new THREE.MeshStandardMaterial({color:0xb9b4c9,roughness:.6,metalness:.15});
+const visor=new THREE.MeshPhysicalMaterial({color:0x1a1430,metalness:.2,roughness:.08,clearcoat:1,envMapIntensity:2});
+const ast=new THREE.Group();
+{const body=new THREE.Mesh(new THREE.CapsuleGeometry(.55,.85,6,14),suit);body.position.y=1.32;ast.add(body);
+ const helm=new THREE.Mesh(new THREE.SphereGeometry(.5,20,16),suit);helm.position.y=2.32;ast.add(helm);
+ const vis=new THREE.Mesh(new THREE.SphereGeometry(.42,20,16),visor);vis.scale.set(.85,.68,.62);vis.position.set(0,2.32,.26);ast.add(vis);
+ const pack=new THREE.Mesh(new THREE.BoxGeometry(.85,.95,.45),suitD);pack.position.set(0,1.58,-.5);ast.add(pack);
+ for(const s of[1,-1]){const leg=new THREE.Mesh(new THREE.CapsuleGeometry(.17,.58,4,10),suitD);leg.position.set(.24*s,.44,0);ast.add(leg);
+  const arm=new THREE.Mesh(new THREE.CapsuleGeometry(.14,.52,4,10),suit);arm.position.set(.7*s,1.5,0);arm.rotation.z=-.4*s;ast.add(arm)}
+ const lamp=new THREE.Sprite(new THREE.SpriteMaterial({map:GT,color:0x9d7bff,blending:THREE.AdditiveBlending,depthWrite:false,transparent:true}));lamp.scale.set(.5,.5,1);lamp.position.set(0,1.75,.55);ast.add(lamp)}
+ast.visible=false;scene.add(ast);
+const flagG=new THREE.Group();
+const pole=new THREE.Mesh(new THREE.CylinderGeometry(.05,.06,3.6,10),new THREE.MeshStandardMaterial({color:0xd8d4e4,metalness:.7,roughness:.3}));
+pole.position.y=1.8;flagG.add(pole);
+const knob=new THREE.Mesh(new THREE.SphereGeometry(.1,12,10),pole.material);knob.position.y=3.65;flagG.add(knob);
+const clothG=new THREE.PlaneGeometry(2.3,1.4,16,10);clothG.translate(1.15,0,0);
+const cloth=new THREE.Mesh(clothG,new THREE.MeshStandardMaterial({color:0xf5f3fc,roughness:.7,metalness:0,side:THREE.DoubleSide,emissive:0x8a7fb0,emissiveIntensity:.12}));
+cloth.position.y=2.85;flagG.add(cloth);
+flagG.visible=false;scene.add(flagG);
+const clothBase=clothG.attributes.position.array.slice();
 // ---- choreography ----
 const P=(p,x,y,z)=>({p,v:new THREE.Vector3(x,y,z)});
-const keys=[P(0,-3,-1.2,-300),P(.28,-1,-.6,-230),P(.40,14,4,-80),P(.48,8,2,-40),P(.58,-6,-.5,-42),P(.68,-12,-3,-70),P(.82,-14,-5,-100),P(1,-13,-5.5,-120)];
+const keys=[P(0,-3,-1.2,-300),P(.224,-1,-.6,-230),P(.32,14,4,-80),P(.384,8,2,-40),P(.464,-6,-.5,-42),P(.544,-12,-3,-70),P(.656,-14,-5,-100),P(.8,-13,-5.5,-120)];
 const sm=t=>t*t*(3-2*t);
 const curve=new THREE.CatmullRomCurve3(keys.map(k=>k.v),false,'centripetal');
 function tAt(p){// map p to curve param by key spacing
@@ -926,20 +930,70 @@ function size(){const r=sticky.getBoundingClientRect();W=Math.max(1,r.width|0);H
 function render(p,t){
  const wp=clamp((p-.30)/.36),warp=Math.sin(Math.PI*wp);
  uni.uTravel.value=sm(wp)*900+t*3;uni.uLen.value=warp*70;uni.uVis.value=1;
- const u=tAt(p);curve.getPoint(u,tmp);tmp.x*=XS;craft.position.copy(tmp);
- curve.getPoint(Math.min(1,u+.01),tmp2);tmp2.x*=XS;if(tmp2.distanceTo(tmp)<1e-4){curve.getPoint(Math.max(0,u-.01),tmp2);tmp2.x*=XS;tmp2.sub(tmp).multiplyScalar(-1).add(tmp)}
- craft.lookAt(tmp2);
- const bank=Math.sin(Math.PI*clamp((p-.36)/.3))*.7-Math.sin(Math.PI*clamp((p-.55)/.25))*.5;
- model.rotation.z=bank+Math.sin(t*.8)*.03;model.rotation.x=Math.sin(t*.6)*.02;
- model.children.forEach(c=>{if(c.name==='eg'){const s=2.2+warp*2.2+Math.sin(t*20)*.15;c.scale.set(s,s,1)}});
- // planet drifts closer late in the sequence; slow spin
- const pp=sm(clamp((p-.55)/.4));pg.position.z=-250+pp*55;pg.position.x=PX+(W/H<.8?3:8)-pp*6;pg.position.y=PY;planet.rotation.y=2.2+t*.01+p*.4;
+ // planet drifts closer late in the sequence; slow spin (frozen after touchdown)
+ const pp=sm(clamp((p-.55)/.4));pg.position.z=-250+pp*55;pg.position.x=PX+(W/H<.8?3:8)-pp*6;pg.position.y=PY;planet.rotation.y=2.2+t*.01+Math.min(p,.8)*.4;
  atmo.material.uniforms.uO.value=sm(clamp((p-.6)/.15));
  halo.material.opacity=.55*sm(clamp((p-.6)/.15));
  pg.visible=p>.55;planet.material.opacity=sm(clamp((p-.58)/.14));
- cam.position.set(0,0,0);cam.lookAt(0,0,-100);
- // slight camera sway for depth
- cam.position.x=Math.sin(t*.2)*.4+(p-.5)*1.2;cam.position.y=Math.cos(t*.17)*.25;
+ // landing site on the planet's near-top surface
+ const C=pg.position;
+ siteV.copy(nV).multiplyScalar(PR).add(C);
+ // craft along the flight curve until the descent window
+ const u=tAt(Math.min(p,.8));curve.getPoint(u,tmp);tmp.x*=XS;
+ curve.getPoint(Math.min(1,u+.01),tmp2);tmp2.x*=XS;if(tmp2.distanceTo(tmp)<1e-4){curve.getPoint(Math.max(0,u-.01),tmp2);tmp2.x*=XS;tmp2.sub(tmp).multiplyScalar(-1).add(tmp)}
+ flyDir.copy(tmp2).sub(tmp);
+ const kL=sm(clamp((p-.80)/.10));
+ if(kL<=0){
+  craft.position.copy(tmp);
+  if(flyDir.lengthSq()>1e-8)orient(craft,flyDir,upY);
+ }else{
+  const cS=Math.min(1,kL*1.12);
+  landFrom.copy(tmp);
+  tmp.lerpVectors(landFrom,siteV,cS).addScaledVector(nV,Math.sin(Math.PI*cS)*6.5+cS*.9);
+  craft.position.copy(tmp);
+  orient(craft,flyDir,upY);qF.copy(craft.quaternion);
+  orient(craft,tanV,nV);qL.copy(craft.quaternion);
+  craft.quaternion.slerpQuaternions(qF,qL,sm(clamp((cS-.4)/.6)));
+  craft.scale.setScalar((W/H<.8?1.0:1.55)*(1-.42*cS));
+ }
+ const bank=(Math.sin(Math.PI*clamp((p-.36)/.3))*.7-Math.sin(Math.PI*clamp((p-.55)/.25))*.5)*(1-kL);
+ model.rotation.z=bank+Math.sin(t*.8)*.03*(1-kL);model.rotation.x=Math.sin(t*.6)*.02*(1-kL);
+ model.children.forEach(c=>{if(c.name==='eg'){const s=Math.max(.001,(2.2+warp*2.2+Math.sin(t*20)*.15)*(1-kL));c.scale.set(s,s,1)}});
+ // astronaut pops out by the nose, hops over, plants a plain flag
+ const kA=sm(clamp((p-.875)/.02)),kH=sm(clamp((p-.885)/.06)),kP=sm(clamp((p-.945)/.03));
+ if(kA>0){
+  offV.copy(nV).multiplyScalar(PR+.2).addScaledVector(tanV,4.6);
+  posA.copy(offV).normalize().multiplyScalar(PR).add(C);
+  offV.copy(nV).multiplyScalar(PR+.2).addScaledVector(tanV,7.6).addScaledVector(sideV,1.2);
+  surfF.copy(offV).normalize();posF.copy(surfF).multiplyScalar(PR).add(C);
+  offV.copy(nV).multiplyScalar(PR+.2).addScaledVector(tanV,6.1).addScaledVector(sideV,.9);
+  posS.copy(offV).normalize().multiplyScalar(PR).add(C);
+  ast.position.lerpVectors(posA,posS,kH);
+  hopN.copy(ast.position).sub(C).normalize();
+  ast.position.addScaledVector(hopN,Math.abs(Math.sin(kH*Math.PI*2.5))*.8*(1-kH*.35));
+  faceV.copy(posF).sub(ast.position);faceV.addScaledVector(hopN,-faceV.dot(hopN));
+  if(faceV.lengthSq()<1e-6)faceV.copy(tanV);
+  orient(ast,faceV,hopN);
+  ast.scale.setScalar(Math.max(.001,kA));
+  ast.visible=true;
+  flagG.position.copy(posF);
+  offV.copy(sideV).multiplyScalar(-1);
+  orient(flagG,offV,surfF);
+  flagG.scale.set(1,Math.max(.001,kP),1);
+  cloth.scale.x=Math.max(.001,sm(clamp((p-.952)/.03)));
+  flagG.visible=kP>0;
+  const posAtt=clothG.attributes.position;
+  for(let i=0;i<posAtt.count;i++){const x=clothBase[i*3];posAtt.setZ(i,cloth.scale.x>.05?(Math.sin(x*1.9+t*5.5)*.17+Math.sin(x*3.6+t*8.2)*.06)*(x/2.3):0)}
+  posAtt.needsUpdate=true;
+ }else{ast.visible=false;flagG.visible=false}
+ // camera: wide for the flight, dives to the surface for the landing
+ const kC=sm(clamp((p-.80)/.18));
+ cam0.set(Math.sin(t*.2)*.4+(p-.5)*1.2,Math.cos(t*.17)*.25,0);
+ camF.copy(siteV).addScaledVector(nV,W/H<.8?20:15).addScaledVector(sideV,-6.5).addScaledVector(tanV,2.5);
+ cam.position.lerpVectors(cam0,camF,kC);
+ lookT.set(0,0,-100);
+ if(kC>0){lookB.copy(siteV).addScaledVector(nV,2.2).addScaledVector(tanV,3.4);lookT.lerp(lookB,kC)}
+ cam.up.set(0,1,0);cam.lookAt(lookT);
  renderer.render(scene,cam)}
 function pr(){const r=sec.getBoundingClientRect(),m=Math.max(r.height-innerHeight,1);return clamp(-r.top/m)}
 function frame(ms){const r=sec.getBoundingClientRect();vis=r.bottom>-100&&r.top<innerHeight+100;
